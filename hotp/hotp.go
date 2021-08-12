@@ -9,11 +9,19 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 )
 
-//getHOTPToken return and token using the RFC 4226 system
+//getTOTPToken return a token using the RFC 4226 system
+//and interval usint the unix time from the server
+func GetTOTPToken(message string) (string, error){
+	interval := time.Now().Unix() / 30
+	return GetHOTPToken(message, interval)
+}
+
+//getHOTPToken return a token using the RFC 4226 system
 //Interval is int64 seconds
-func getHOTPToken(message string, interval int64) (string, error) {
+func GetHOTPToken(message string, interval int64) (string, error) {
 	if len(message) != 16{
 		return "", fmt.Errorf("message need to be 16 digit len but get a %d len", len(message))
 	}

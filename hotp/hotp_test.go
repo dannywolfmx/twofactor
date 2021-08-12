@@ -15,7 +15,7 @@ func TestGetHOTPToken(t *testing.T) {
 	duration := unixTime / intervalInSeconds
 	expectedResult := "427727"
 
-	result, err := getHOTPToken(message, duration) 
+	result, err := GetHOTPToken(message, duration) 
 
 	assert.NoError(t, err)
 	assert.Equal(t,len(expectedResult), len(result))
