@@ -10,16 +10,52 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	qrcode "github.com/yeqown/go-qrcode"
 )
 
-//getTOTPToken return a token using the RFC 4226 system
+type Auth struct{
+	Label 	string
+	User 		string
+	Key 		string 
+	Digits 	int64
+	Period 	int64
+}
+
+func GenerateAuthQR(auth Auth) error{
+	url := GenerateURL(auth) 
+	return GenerateQR(url)
+}
+
+func GenerateURL(auth Auth) string{
+	return fmt.Sprintf("otpauth://totp/%s:%s?secret=%s&issuer=%s&digits=%d&period=%d",
+		auth.Label,
+		auth.User,
+		auth.Key,
+		auth.Label,
+		auth.Digits,
+		auth.Period,
+	)
+}
+
+//GenerateAQR from string message
+func GenerateQR(message string) error{
+	qrc, err := qrcode.New(message)
+	if err != nil{
+		return err
+	}
+
+	return qrc.Save("./testqr.jpeg");
+}
+
+//GetTOTPToken return a token using the RFC 4226 system
 //and interval usint the unix time from the server
 func GetTOTPToken(message string) (string, error){
 	interval := time.Now().Unix() / 30
 	return GetHOTPToken(message, interval)
 }
 
-//getHOTPToken return a token using the RFC 4226 system
+//GetHOTPToken return a token using the RFC 4226 system
 //Interval is int64 seconds
 func GetHOTPToken(message string, interval int64) (string, error) {
 	if len(message) != 16{

@@ -6,6 +6,41 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestGenerateAuthQR(t *testing.T) {
+	auth := Auth{
+		Label: "Example",
+		User:"demo@google.com",
+		Key:"JBSWY3DPEHPK3PXP",
+		Digits: 6,
+		Period: 30,
+	}
+	err := GenerateAuthQR(auth)
+	assert.NoError(t, err)
+}
+func TestGenerateURL(t *testing.T){
+	auth := Auth{
+		Label: "Example 2",
+		User:"demo@google.com",
+		Key:"JBSWY3DPEHPK3PXP",
+		Digits: 6,
+		Period: 30,
+	}
+	url := "otpauth://totp/Example 2:demo@google.com?secret=JBSWY3DPEHPK3PXP&issuer=Example 2&digits=6&period=30"
+
+	result := GenerateURL(auth)
+
+	assert.Equal(t, url, result)
+}
+
+func TestGenerateQR(t *testing.T) {
+
+	message := "https://github.com/dannywolfmx"
+	err := GenerateQR(message)
+
+	assert.NoError(t, err)
+
+}
+
 func TestGetHOTPToken(t *testing.T) {
 	//Secret message and duration
 
