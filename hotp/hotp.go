@@ -7,6 +7,7 @@ import (
 	"encoding/base32"
 	"encoding/binary"
 	"fmt"
+	"io"
 	"strconv"
 	"strings"
 	"time"
@@ -22,9 +23,9 @@ type Auth struct{
 	Period 	int64
 }
 
-func GenerateAuthQR(auth Auth) error{
+func GenerateAuthQR(auth Auth, w io.Writer) error{
 	url := GenerateURL(auth) 
-	return GenerateQR(url)
+	return GenerateQR(url, w)
 }
 
 func GenerateURL(auth Auth) string{
@@ -39,13 +40,13 @@ func GenerateURL(auth Auth) string{
 }
 
 //GenerateAQR from string message
-func GenerateQR(message string) error{
+func GenerateQR(message string, w io.Writer) error{
 	qrc, err := qrcode.New(message)
 	if err != nil{
 		return err
 	}
 
-	return qrc.Save("./testqr.jpeg");
+	return qrc.SaveTo(w)
 }
 
 //GetTOTPToken return a token using the RFC 4226 system

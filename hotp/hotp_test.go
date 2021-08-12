@@ -1,12 +1,19 @@
 package hotp
 
 import (
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGenerateAuthQR(t *testing.T) {
+	file, err := os.Create("testqr.jpeg")
+
+	require.NoError(t, err)
+
+	defer file.Close()
 	auth := Auth{
 		Label: "Example",
 		User:"demo@demo.com",
@@ -14,7 +21,7 @@ func TestGenerateAuthQR(t *testing.T) {
 		Digits: 6,
 		Period: 30,
 	}
-	err := GenerateAuthQR(auth)
+	err = GenerateAuthQR(auth, file)
 	assert.NoError(t, err)
 }
 func TestGenerateURL(t *testing.T){
@@ -33,9 +40,14 @@ func TestGenerateURL(t *testing.T){
 }
 
 func TestGenerateQR(t *testing.T) {
+	file, err := os.Create("testqr.jpeg")
+
+	require.NoError(t, err)
+
+	defer file.Close()
 
 	message := "https://github.com/dannywolfmx"
-	err := GenerateQR(message)
+	err = GenerateQR(message, file)
 
 	assert.NoError(t, err)
 }
