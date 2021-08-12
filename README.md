@@ -15,4 +15,4 @@ Example of qr with the next data:
 	}
 ```
 
-<img src="./hotp/testqr.jpeg" width="200" height="200">
+<img src="./hotp/testqr.jpeg" width="300" height="300">
