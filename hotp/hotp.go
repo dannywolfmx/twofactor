@@ -18,7 +18,7 @@ type Auth struct{
 	Label 	string
 	User 		string
 	Key 		string 
-	Digits 	int64
+	Digits 	int
 	Period 	int64
 }
 
@@ -50,19 +50,19 @@ func GenerateQR(message string) error{
 
 //GetTOTPToken return a token using the RFC 4226 system
 //and interval usint the unix time from the server
-func GetTOTPToken(message string) (string, error){
-	interval := time.Now().Unix() / 30
-	return GetHOTPToken(message, interval)
+func GetTOTPToken(auth Auth) (string, error){
+	interval := time.Now().Unix() / auth.Period
+	return GetHOTPToken(auth, interval)
 }
 
 //GetHOTPToken return a token using the RFC 4226 system
 //Interval is int64 seconds
-func GetHOTPToken(message string, interval int64) (string, error) {
-	if len(message) != 16{
-		return "", fmt.Errorf("message need to be 16 digit len but get a %d len", len(message))
+func GetHOTPToken(auth Auth, interval int64) (string, error) {
+	if len(auth.Key) != 16{
+		return "", fmt.Errorf("key need to be 16 digit len but get a %d len", len(auth.Key))
 	}
 	//convert message to [A-Z]
-	message = strings.ToUpper(message)
+	message := strings.ToUpper(auth.Key)
 
 	//Encode the message
 	key, err := base32.StdEncoding.DecodeString(message)
@@ -96,16 +96,16 @@ func GetHOTPToken(message string, interval int64) (string, error) {
 
 	otp := strconv.Itoa(int(h12))
 
-	return normalizeOTP(otp), nil
+	return normalizeOTP(otp, auth.Digits), nil
 }
 
 //Check if the length is 6, or add extra zeros
-func normalizeOTP(otp string) string{
-	if len(otp) == 6{
+func normalizeOTP(otp string, lenght int) string{
+	if len(otp) == int(lenght){
 		return otp
 	}
 
-	for i := (6 - len(otp)); i > 0; i--{
+	for i := (int(lenght) - len(otp)); i > 0; i--{
 		otp = "0" + otp
 	}
 	return otp

@@ -9,7 +9,7 @@ import (
 func TestGenerateAuthQR(t *testing.T) {
 	auth := Auth{
 		Label: "Example",
-		User:"demo@google.com",
+		User:"demo@demo.com",
 		Key:"JBSWY3DPEHPK3PXP",
 		Digits: 6,
 		Period: 30,
@@ -20,12 +20,12 @@ func TestGenerateAuthQR(t *testing.T) {
 func TestGenerateURL(t *testing.T){
 	auth := Auth{
 		Label: "Example 2",
-		User:"demo@google.com",
+		User:"demo@demo.com",
 		Key:"JBSWY3DPEHPK3PXP",
 		Digits: 6,
 		Period: 30,
 	}
-	url := "otpauth://totp/Example 2:demo@google.com?secret=JBSWY3DPEHPK3PXP&issuer=Example 2&digits=6&period=30"
+	url := "otpauth://totp/Example 2:demo@demo.com?secret=JBSWY3DPEHPK3PXP&issuer=Example 2&digits=6&period=30"
 
 	result := GenerateURL(auth)
 
@@ -38,19 +38,38 @@ func TestGenerateQR(t *testing.T) {
 	err := GenerateQR(message)
 
 	assert.NoError(t, err)
+}
 
+func TestGetTOTPToken(t *testing.T){
+	auth := Auth{
+		Label: "Example",
+		User:"demo@demo.com",
+		Key:"JBSWY3DPEHPK3PXP",
+		Digits: 6,
+		Period: 30,
+	}
+
+	result, err := GetTOTPToken(auth)
+	assert.NoError(t, err)
+	assert.Len(t, result, auth.Digits)
+	t.Fatal(result)
 }
 
 func TestGetHOTPToken(t *testing.T) {
 	//Secret message and duration
 
-	message := "dummySECRETdummy"
-	intervalInSeconds := int64(30)
 	unixTime := int64(1628726047)
-	duration := unixTime / intervalInSeconds
-	expectedResult := "427727"
+	auth := Auth{
+		Label: "Example",
+		User:"demo@demo.com",
+		Key:"JBSWY3DPEHPK3PXP",
+		Digits: 6,
+		Period: 30,
+	}
+	duration := unixTime / auth.Period
+	expectedResult := "554427"
 
-	result, err := GetHOTPToken(message, duration) 
+	result, err := GetHOTPToken(auth, duration) 
 
 	assert.NoError(t, err)
 	assert.Equal(t,len(expectedResult), len(result))
@@ -58,6 +77,8 @@ func TestGetHOTPToken(t *testing.T) {
 }
 
 func TestNormalizeOTP(t *testing.T){
+
+	lenght := 6
 
 	//Input - ExpectedOutput
 	testData := map[string]string{
@@ -71,7 +92,7 @@ func TestNormalizeOTP(t *testing.T){
 
 
 	for key, value := range testData{
-		result := normalizeOTP(key)
+		result := normalizeOTP(key, lenght)
 		assert.Equal(t, value, result)
 	}
 }
